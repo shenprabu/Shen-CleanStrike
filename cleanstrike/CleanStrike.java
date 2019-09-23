@@ -17,7 +17,7 @@ public class CleanStrike {
 
     public static void main(String[] args) {
         // TODO code application logic here
-
+        
         b = new Board();
         Player p1 = new Player("Player 1");
         Player p2 = new Player("Player 2");
@@ -70,23 +70,26 @@ public class CleanStrike {
         Scanner scanner = new Scanner(System.in);
 
         try {
-            int turn = scanner.nextInt();
+            int stroke = scanner.nextInt();
             boolean isMultiStrikeAvailable = b.isMultiStrikeAvailable();
             boolean isRedStrikeAvailable = b.isRedStrikeAvailable();
+            int strokePoint = 0;
                     
-            switch (turn) {
+            switch (stroke) {
 
-                case 1:
-                    p.addScore(1);
-                    p.addHistory(1);
+                case Stroke.STRIKE:
+                    
+                    //p.addScore(1);
+                    strokePoint = 1;
                     b.reduceCoin(1);
                     System.out.println(String.format("%s scores 1 point !!", p.name));
                     break;
 
-                case 2:
+                case Stroke.MULTISTRIKE:
+                    
                     if (isMultiStrikeAvailable) {
-                        p.addScore(2);
-                        p.addHistory(2);
+                        //p.addScore(2);
+                        strokePoint = 2;
                         b.reduceCoin(2);    // TODO - all but 2 coins in ??
                         System.out.println(String.format("%s scores 2 points !!", p.name));
                     } else {
@@ -95,10 +98,11 @@ public class CleanStrike {
                     }
                     break;
 
-                case 3:
+                case Stroke.RED_STRIKE:
+                    
                     if (isRedStrikeAvailable) {
-                        p.addScore(3);
-                        p.addHistory(3);
+                        //p.addScore(3);
+                        strokePoint = 3;
                         b.reduceRed();
                         System.out.println(String.format("Red covered !! %s scores 3 points !!", p.name));
                     } else {
@@ -107,37 +111,52 @@ public class CleanStrike {
                     }
                     break;
 
-                case 4:
-                    p.addScore(-1);
-                    p.addHistory(4);
+                case Stroke.STRIKER_STRIKE:
+                    
+                    //p.addScore(-1);
+                    strokePoint = -1;
                     System.out.println(String.format("%s loses 1 point !!", p.name));
                     break;
 
-                case 5:
-                    p.addScore(-2);
+                case Stroke.DEFUNCT_COIN:
+                    
+                    //p.addScore(-2);
+                    strokePoint = -2;
                     p.addHistory(5);
                     b.reduceCoin(1);
                     System.out.println(String.format("%s loses 2 points !!", p.name));
                     break;
 
-                case 6:
-                    p.addHistory(6);
-                    if (p.noneForLast3Turns()) {
-                        p.addScore(-1);
+                case Stroke.NONE:
+                    
+                    if (p.getNoneStreak() == 2) {   // if 3 stokes continuously are none
+                        //p.addScore(-1);
+                        strokePoint = -1;
                         System.out.println(String.format("None for last 3 turns. %s loses 1 point !!", p.name));
+                        p.resetNoneStreak();
                     } else {
                         System.out.println(String.format("No points in this turn !!"));
+                        p.addNoneSteak();
                     }
                     break;
 
                 default:
+                    
                     System.out.println("wrong input :( Try again...");
                     playersTurn(p);
 
             }
-            if (turn > 0 && turn < 7 && !(turn == 2 && !isMultiStrikeAvailable) && !(turn == 3 && !isRedStrikeAvailable)) {
+            p.addScore(strokePoint);
+            
+            if (stroke >= Stroke.STRIKE && stroke <= Stroke.getMax() && !(stroke == Stroke.MULTISTRIKE && !isMultiStrikeAvailable) && !(stroke == Stroke.RED_STRIKE && !isRedStrikeAvailable)) {
                 System.out.println(String.format("Coins remaining : %s, Red remaining : %s", b.getCoins(), b.getRed()));
+                
+                p.addHistory(stroke);
+                if(stroke != Stroke.NONE) {
+                    p.resetNoneStreak();
+                }
             }
+            
 
         } catch (InputMismatchException e) {
             System.out.println("wrong input :( Try again...");

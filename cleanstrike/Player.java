@@ -12,11 +12,13 @@ public class Player {
     public String name;
     private int score;
     private ArrayList<Integer> history; 
+    private int noneStreak;
     
     Player(String name) {
         this.name = name;
         this.score = 0;
         this.history = new ArrayList();
+        this.noneStreak = 0;
     }
     
     void addScore(int point) {
@@ -27,23 +29,20 @@ public class Player {
         return this.score;
     }
     
-    void addHistory(int turn) {
-        this.history.add(turn);
+    void addHistory(int stroke) {
+        this.history.add(stroke);
     }
     
-    boolean noneForLast3Turns() {
-        
-        int size = this.history.size();
-        
-        if(size < 3) {
-            return false;
-        }
-        
-        if(this.history.get(size - 1) == 6 && this.history.get(size - 2) == 6 && this.history.get(size - 3) == 6) {
-            // TODO - if player continuously scores none for 4 time, score will be deduced twice.
-            return true;
-        }
-        return false;
+    void addNoneSteak() {
+        this.noneStreak++;
+    }
+    
+    int getNoneStreak() {
+        return this.noneStreak;
+    }
+    
+    void resetNoneStreak() {
+        this.noneStreak = 0;
     }
    
 }
